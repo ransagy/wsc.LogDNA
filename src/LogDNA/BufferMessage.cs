@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace RedBear.LogDNA
+namespace wsc.LogDNA
 {
     /// <summary>
     /// Data structure for data sent to LogDNA servers.

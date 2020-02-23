@@ -1,7 +1,7 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 
-namespace RedBear.LogDNA
+namespace wsc.LogDNA
 {
     /// <summary>
     /// Represents a single line of a log file.

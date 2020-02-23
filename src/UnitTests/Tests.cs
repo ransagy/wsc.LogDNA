@@ -1,77 +1,52 @@
-using RedBear.LogDNA;
 using System;
+using System.Net.Http;
 using System.Threading;
-// ReSharper disable once RedundantUsingDirective
+using System.Threading.Tasks;
+using wsc.LogDNA;
 using Xunit;
 
 namespace UnitTests
 {
     public class Tests
     {
-        private const int FlushTimeout = 30000;
-        private const string IngestionKey = "PUT-KEY-HERE";
+        // TODO add mocked handler that auto replies if given correctly formed data
+        private static readonly HttpClient httpClient = new HttpClient(new HttpClientHandler { AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate });
 
         [Fact(Skip = "Has Side-effects")]
-        public void DefaultLogsOk()
+        public async Task HttpSingleLogOk()
         {
-            var config = new ConfigurationManager(IngestionKey) {Tags = new[] {"foo", "bar"}};
-            var client = config.Initialise();
-
-            client.Connect();
-
-            client.AddLine(new LogLine("MyLog", "From Default Client"));
-
-            Thread.Sleep(FlushTimeout);
-            client.Disconnect();
-        }
-
-        [Fact(Skip = "Has Side-effects")]
-        public void HttpLogsOk()
-        {
-            var config = new ConfigurationManager(IngestionKey) { Tags = new[] { "foo", "bar" } };
-            config.Initialise();
-
-            var client = new HttpApiClient(config);
-
-            client.Connect();
+            IApiClient client = await InitConfigAndClient().ConfigureAwait(false);
 
             client.AddLine(new LogLine("MyLog", "From HTTP Client"));
 
-            Thread.Sleep(FlushTimeout);
+            // TODO should be awaiting the mock result instead.
+            Thread.Sleep((int)TimeSpan.FromSeconds(30).TotalMilliseconds);
+
             client.Disconnect();
         }
 
         [Fact(Skip = "Has Side-effects")]
-        public void SocketLogsOk()
+        public async Task HttpMultipleLogsOk()
         {
-            var config = new ConfigurationManager(IngestionKey) { Tags = new[] { "foo", "bar" } };
-            config.Initialise();
+            IApiClient client = await InitConfigAndClient().ConfigureAwait(false);
 
-            var client = new SocketApiClient(config);
-
-            client.Connect();
-
-            client.AddLine(new LogLine("MyLog", "From WebSocket Client"));
-
-            Thread.Sleep(FlushTimeout);
-            client.Disconnect();
-        }
-
-        [Fact(Skip = "Has Side-effects")]
-        public void DefaultLogsLotsOk()
-        {
-            var config = new ConfigurationManager(IngestionKey) { Tags = new[] { "foo", "bar" } };
-            var client = config.Initialise();
-
-            client.Connect();
-
-            for (var i = 0; i < 1000; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 client.AddLine(new LogLine("MyLog", $"From Default Client {i} {DateTime.UtcNow.ToShortTimeString()}"));
             }
 
-            Thread.Sleep(FlushTimeout);
+            // TODO should be awaiting the mock result instead.
+            Thread.Sleep((int)TimeSpan.FromSeconds(30).TotalMilliseconds);
+
             client.Disconnect();
+        }
+
+        private async Task<IApiClient> InitConfigAndClient()
+        {
+            var config = new ClientConfiguration("1082cb87a05595a2c997044cdbbefc4e") { Tags = new[] { "foo", "bar" }, LogInternalsToConsole = true };
+            IApiClient client = new HttpApiClient(config, httpClient);
+            await client.ConnectAsync().ConfigureAwait(false);
+            return client;
         }
     }
 }

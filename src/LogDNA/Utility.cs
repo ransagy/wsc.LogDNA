@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RedBear.LogDNA
+namespace wsc.LogDNA
 {
     internal static class Utility
     {
@@ -11,7 +11,7 @@ namespace RedBear.LogDNA
         /// <returns>The UNIX timestamp repersentation of the DateTime.</returns>
         public static int ToUnixTimestamp(this DateTime time)
         {
-            var t = time - new DateTime(1970, 1, 1);
+            TimeSpan t = time - new DateTime(1970, 1, 1);
             return (int)t.TotalSeconds;
         }
 
@@ -22,8 +22,7 @@ namespace RedBear.LogDNA
         /// <returns>The Java timestamp repersentation of the DateTime in milliseconds.</returns>
         public static long ToJavaTimestamp(this DateTime time)
         {
-            return ((long) time.ToUnixTimestamp())*1000;
+            return ((long)time.ToUnixTimestamp()) * 1000;
         }
-
     }
 }
