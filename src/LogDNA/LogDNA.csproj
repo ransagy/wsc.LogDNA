@@ -2,32 +2,36 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>RedBear.LogDNA</AssemblyName>
-    <RootNamespace>RedBear.LogDNA</RootNamespace>
+    <AssemblyName>wsc.LogDNA</AssemblyName>
+    <RootNamespace>wsc.LogDNA</RootNamespace>
+    <!-- Solely for C# 8 syntax support since the rest are supported only on netcoreapp3.0/netstandard2.1 -->
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageProjectUrl>https://github.com/RedBearSys/RedBear.LogDNA</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/ransagy/wsc.LogDNA</PackageProjectUrl>
     <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
     <Description>.NET Standard LogDNA client</Description>
+    <Copyright>Copyright ©2020 WSC Sports Technologies</Copyright>
+    <Company>WSC Sports Technologies</Company>
+    <Authors>WSC Sports Technologies</Authors>
+    <PackageIconUrl>https://wsc-sports.com/Content/img/main/footer/footer_logo_front.jpg</PackageIconUrl>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="websocketsharp.core" Version="1.0.0" />
+    <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+  <!--<ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>UnitTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>-->
 
 </Project>
