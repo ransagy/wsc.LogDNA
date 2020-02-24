@@ -1,4 +1,4 @@
-name: .NET Core
+name: PR Sanity
 
 on: 
   pull_request:
