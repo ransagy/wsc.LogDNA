@@ -19,12 +19,12 @@ jobs:
         dotnet-version: 3.1.102
     
     - name: Build
-      run: dotnet build --configuration Release src\LogDNA.sln
+      run: dotnet build --configuration Release src/LogDNA.sln
 
   test:
-    
+    needs: [build]
     runs-on: [ubuntu-latest]
     
     steps:
     - name: Test
-      run: dotnet test --no-build src\LogDNA.sln
+      run: dotnet test --no-build src/LogDNA.sln
