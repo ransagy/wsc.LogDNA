@@ -19,7 +19,7 @@ jobs:
         dotnet-version: 3.1.102
     
     - name: Build
-      run: dotnet build --configuration Release
+      run: dotnet build --configuration Release src\LogDNA.sln
 
   test:
     
@@ -27,4 +27,4 @@ jobs:
     
     steps:
     - name: Test
-      run: dotnet test
+      run: dotnet test --no-build src\LogDNA.sln
