@@ -1,0 +1,58 @@
+name: Publish NuGet
+
+on: 
+  ['deployment']
+
+jobs:
+  build:
+    name: Build Packages
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.102
+
+    - name: Build
+      run: dotnet build --configuration Release src/LogDNA.sln
+    
+    - name: Pack
+      run: dotnet pack src/LogDNA --configuration Release -o packages --no-build
+
+    - name: Publish artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: nupkg
+        path: packages
+
+  deploy:
+      name: Deploy Packages
+      runs-on: ubuntu-latest
+      needs: build
+
+      steps:
+        - name: Download Package artifact
+          uses: actions/download-artifact@master
+          with:
+            name: nupkg
+            
+        - name: Setup NuGet
+          uses: NuGet/setup-nuget@v1.0.2
+          with:
+            nuget-version: latest
+
+        - name: Setup .NET SDK tools
+          uses: actions/setup-dotnet@master
+          with:
+            dotnet-version: '3.1.102'
+            source-url: https://www.nuget.org/api/v2/package
+          env:
+            NUGET_AUTH_TOKEN: ${{ secrets.NUGET_ORG_TOKEN }} 
+
+        - name: Push to NuGet.org (using dotnet)
+          env:
+            NUGET_AUTH_TOKEN: ${{ secrets.NUGET_ORG_TOKEN }} 
+          run: dotnet nuget push nupkg/*.nupkg -k $NUGET_AUTH_TOKEN --skip-duplicate
