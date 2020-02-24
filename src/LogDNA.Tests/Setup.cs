@@ -8,11 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using wsc.LogDNA;
 
-namespace UnitTests
+namespace LogDNA.Tests
 {
     internal static class Setup
     {
-        private static readonly string baseURI = $"https://{nameof(UnitTests)}.{nameof(Setup)}";
+        private static readonly string baseURI = $"https://{nameof(LogDNA)}.{nameof(LogDNA.Tests)}.{nameof(Setup)}";
 
         internal const string FakeServerHost = "fake.logs.server.com";
         internal const string MockedMethodName = "SendAsync";

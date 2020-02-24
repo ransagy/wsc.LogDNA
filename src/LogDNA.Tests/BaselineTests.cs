@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 using wsc.LogDNA;
 using Xunit;
 
-namespace UnitTests
+namespace LogDNA.Tests
 {
-    public class Tests
+    public class BaselineTests
     {
         [Fact]
         public async Task AuthenticationOk()
