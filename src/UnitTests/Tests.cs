@@ -1,5 +1,9 @@
+using Moq;
+using Moq.Protected;
 using System;
+using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using wsc.LogDNA;
@@ -9,44 +13,39 @@ namespace UnitTests
 {
     public class Tests
     {
-        // TODO add mocked handler that auto replies if given correctly formed data
-        private static readonly HttpClient httpClient = new HttpClient(new HttpClientHandler { AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate });
-
         [Fact]
-        public async Task HttpSingleLogOk()
+        public async Task AuthenticationOk()
         {
-            IApiClient client = await InitConfigAndClient().ConfigureAwait(false);
+            (IApiClient client, Mock<HttpMessageHandler> mock) = await Setup.InitConfigAndClient().ConfigureAwait(false);
 
-            client.AddLine(new LogLine("MyLog", "From HTTP Client"));
-
-            // TODO should be awaiting the mock result instead.
-            Thread.Sleep((int)TimeSpan.FromSeconds(30).TotalMilliseconds);
-
-            client.Disconnect();
+            mock.Protected().Verify(Setup.MockedMethodName, Times.Once(), ItExpr.Is<HttpRequestMessage>(m => m.RequestUri.AbsoluteUri.Contains(Setup.AuthenticationURIPath, StringComparison.OrdinalIgnoreCase)), ItExpr.IsAny<CancellationToken>());
         }
 
-        [Fact]
-        public async Task HttpMultipleLogsOk()
+        [Theory]
+        [InlineData(1)]
+        [InlineData(1000)]
+        public async Task AddLogLineOk(int runCount)
         {
-            IApiClient client = await InitConfigAndClient().ConfigureAwait(false);
+            (IApiClient client, Mock<HttpMessageHandler> mock) = await Setup.InitConfigAndClient().ConfigureAwait(false);
+            var handle = new ManualResetEventSlim();
 
-            for (int i = 0; i < 1000; i++)
+            var mockResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK };
+            mock.Protected()
+                .Setup<Task<HttpResponseMessage>>(Setup.MockedMethodName, ItExpr.Is<HttpRequestMessage>(m => m.RequestUri.AbsoluteUri.Contains(Setup.FakeServerHost, StringComparison.OrdinalIgnoreCase)), ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(mockResponse)
+                .Callback(() => handle.Set())
+                .Verifiable();
+
+            for (int i = 0; i < runCount; i++)
             {
-                client.AddLine(new LogLine("MyLog", $"From Default Client {i} {DateTime.UtcNow.ToShortTimeString()}"));
+                client.AddLine(new LogLine("MyLog", $"Client Test {i} {DateTime.UtcNow.ToShortTimeString()}"));
             }
 
-            // TODO should be awaiting the mock result instead.
-            Thread.Sleep((int)TimeSpan.FromSeconds(30).TotalMilliseconds);
+            handle.Wait((int)TimeSpan.FromMinutes(1).TotalMilliseconds);
+
+            mock.Protected().Verify(Setup.MockedMethodName, Times.AtLeastOnce(), ItExpr.Is<HttpRequestMessage>(m => m.RequestUri.AbsoluteUri.Contains(Setup.FakeServerHost, StringComparison.OrdinalIgnoreCase)), ItExpr.IsAny<CancellationToken>());
 
             client.Disconnect();
-        }
-
-        private async Task<IApiClient> InitConfigAndClient()
-        {
-            var config = new ClientConfiguration("1082cb87a05595a2c997044cdbbefc4e") { Tags = new[] { "foo", "bar" }, LogInternalsToConsole = true };
-            IApiClient client = new HttpApiClient(config, httpClient);
-            await client.ConnectAsync().ConfigureAwait(false);
-            return client;
         }
     }
 }
