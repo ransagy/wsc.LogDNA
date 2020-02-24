@@ -1,18 +1,19 @@
-﻿namespace RedBear.LogDNA
+﻿using System.Threading.Tasks;
+
+namespace wsc.LogDNA
 {
     public interface IApiClient
     {
         /// <summary>
-        /// Whether the client is connectead to LogDNA.
+        /// Whether the client is connected to LogDNA.
         /// </summary>
-        /// <returns></returns>
-        bool Active { get; set; }
+        /// <returns><c>true</c> if connected; Otherwise, <c>false</c>.</returns>
+        bool Connected { get; set; }
 
         /// <summary>
         /// Connects to the LogDNA servers using the specified configuration.
         /// </summary>
-        /// <returns></returns>
-        void Connect();
+        Task ConnectAsync();
 
         /// <summary>
         /// Disconnects the client from the LogDNA servers.
@@ -20,20 +21,20 @@
         void Disconnect();
 
         /// <summary>
-        /// Sends the specified message directly to the websocket.
+        /// Sends the specified message directly to the LogDNA servers without buffering.
         /// </summary>
         /// <param name="message">The message.</param>
         /// <returns>True if the message was transmitted successfully.</returns>
-        bool Send(string message);
+        Task<bool> Send(string message);
 
         /// <summary>
-        /// Adds a LogLine to the buffer.
+        /// Adds log data to the buffer to be sent when the flush interval happens.
         /// </summary>
         /// <param name="line">The line.</param>
         void AddLine(LogLine line);
 
         /// <summary>
-        /// Flushes the log buffer.
+        /// Forcefully flushes the log buffer.
         /// </summary>
         void Flush();
     }
