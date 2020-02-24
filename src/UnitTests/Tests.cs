@@ -11,7 +11,7 @@ namespace UnitTests
         private const int FlushTimeout = 30000;
         private const string IngestionKey = "PUT-KEY-HERE";
 
-        //[Fact]
+        [Fact(Skip = "Has Side-effects")]
         public void DefaultLogsOk()
         {
             var config = new ConfigurationManager(IngestionKey) {Tags = new[] {"foo", "bar"}};
@@ -25,7 +25,7 @@ namespace UnitTests
             client.Disconnect();
         }
 
-        //[Fact]
+        [Fact(Skip = "Has Side-effects")]
         public void HttpLogsOk()
         {
             var config = new ConfigurationManager(IngestionKey) { Tags = new[] { "foo", "bar" } };
@@ -41,7 +41,7 @@ namespace UnitTests
             client.Disconnect();
         }
 
-        //[Fact]
+        [Fact(Skip = "Has Side-effects")]
         public void SocketLogsOk()
         {
             var config = new ConfigurationManager(IngestionKey) { Tags = new[] { "foo", "bar" } };
@@ -57,7 +57,7 @@ namespace UnitTests
             client.Disconnect();
         }
 
-        //[Fact]
+        [Fact(Skip = "Has Side-effects")]
         public void DefaultLogsLotsOk()
         {
             var config = new ConfigurationManager(IngestionKey) { Tags = new[] { "foo", "bar" } };
